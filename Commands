@@ -68,7 +68,7 @@ Web Enumeration:
 curl 10.11.X.X -s -L | grep "title\|href" | sed -e 's/^[[:space:]]*//'
 curl 10.11.X.X -s -L | html2text -width '99' | uniq
 
-nmap 10.11.1.71 -p 80 \
+nmap 10.11.1.X -p 80 \
   --script=http-shellshock \
   --script-args uri=/cgi-bin/test.cgi --script-args uri=/cgi-bin/admin.cgi
 Pay attention to script args
@@ -80,21 +80,21 @@ whatweb -v -a 3 10.11.1.X
 
 wfuzz
 
-wfuzz -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt -c --hc 404 https://10.11.1.35/FUZZ
+wfuzz -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt -c --hc 404 https://10.11.1.X/FUZZ
 
 wfuzz with  hide pages with 0 lines:
-wfuzz -w /usr/share/dirbuster/wordlists/directory-list-2.3-small.txt -c --hc 404 --hl 0 https://10.11.1.35/https://10.11.1.35/section.php?page=FUZZ 
+wfuzz -w /usr/share/dirbuster/wordlists/directory-list-2.3-small.txt -c --hc 404 --hl 0 https://10.11.1.X/https://10.11.1.X/section.php?page=FUZZ 
 
 Dirb
-dirb http://10.11.1.229 /usr/share/dirb/wordlists/vulns/iis.txt -w
+dirb http://10.11.1.X /usr/share/dirb/wordlists/vulns/iis.txt -w
 
 Gobuster:
 
 	• Apache -CGI:
- gobuster -u http://10.11.1.71/ \  -w /usr/share/seclists/Discovery/Web_Content/cgis.txt \ -s '200,204,403,500' -e
+ gobuster -u http://10.11.1.X/ \  -w /usr/share/seclists/Discovery/Web_Content/cgis.txt \ -s '200,204,403,500' -e
 
 	• Common:
-gobuster -w /usr/share/wordlists/dirb/common.txt -u http://10.11.1.223/ -fw -s 200,204,301,302,307,403,401 
+gobuster -w /usr/share/wordlists/dirb/common.txt -u http://10.11.1.X/ -fw -s 200,204,301,302,307,403,401 
 
 Dirsearch (amazing tool : https://github.com/maurosoria/dirsearch)
 python3 ~/tools/brute-force/dirsearch/dirsearch.py -u http://X.X.X.X
@@ -176,11 +176,11 @@ nmap -sV --script=nfs-showmount  IP
 Step6 => SMTP
 
 SMTP enum:
-smtp-user-enum -M VRFY -D acme.local -U /root/Desktop/oscp-users -t 10.11.1.115
+smtp-user-enum -M VRFY -D acme.local -U /root/Desktop/oscp-users -t 10.11.1.X
 
-smtp-user-enum -M VRFY -U /root/seclists/oscp-users.txt -t 10.3.3.47 
+smtp-user-enum -M VRFY -U /root/seclists/oscp-users.txt -t 10.X.X.X
 
-ismtp -h 10.3.3.47:25 -e /root/seclists/oscp-users.txt
+ismtp -h 10.X.X.X:25 -e /root/seclists/oscp-users.txt
 
 Automation:
 
