@@ -1,0 +1,8 @@
+## ALIASES
+alias l='ls -la'
+alias webup='python -m SimpleHTTPServer 80'
+alias ss='searchsploit $1'
+alias ssx='searchsploit -x $1'
+alias lproof='cat proof.txt && hostname && id && whoami && /sbin/ifconfig'
+alias wproof='hostname && whoami.exe && type proof.txt && ipconfig /all'
+alias wproof2='hostname && whoami && type proof.txt && ipconfig /all'
