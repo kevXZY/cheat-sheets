@@ -1,4 +1,4 @@
-Run file as another user with powershell.
+Run command as another user with powershell.
 
 $username = 'hacker'
 $password = 'hacker123'
