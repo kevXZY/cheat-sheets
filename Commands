@@ -4,7 +4,7 @@ Quick:
 
 nmap --top-ports 20 --open
 
-nmap -A -O 10.11
+nmap -A -O 10.X.X.X
 
 netcat -v -z -n -w 1 X.X.X.X 1-1023
 
